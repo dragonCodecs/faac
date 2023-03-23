@@ -1,0 +1,4 @@
+# SPDX-FileCopyrightText: 2023 Amyspark <amy@amyspark.me>
+# SPDX-License-Identifier: BSD-3-Clause
+
+option('drm', type: 'boolean', value: 'true', description: 'Digital Radio Mondiale support')
