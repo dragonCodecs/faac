@@ -9,7 +9,6 @@ project(
 	default_options: [
 		'c_std=c99',
 		'warning_level=1',
-		'default_library=static',
 	]
 )
 
@@ -97,6 +96,26 @@ if mingw
 	faac_link_args += compiler.get_supported_link_arguments('-Wl,--add-stdcall-alias')
 endif
 
+makedef = find_program('packaging/makedef.py')
+makedef_args = [makedef]
+if compiler.get_argument_syntax() == 'msvc'
+  dumpbin = find_program('dumpbin', required: true)
+  makedef_args += ['--dumpbin', dumpbin]
+else
+  nm = find_program('nm', 'llvm-nm', required: true)
+  makedef_args += ['--nm', nm]
+endif
+extern_prefix = compiler.symbols_have_underscore_prefix() ? '_' : ''
+if target_machine.system() == 'windows'
+	makedef_args += ['--prefix', extern_prefix]
+	makedef_args += ['--format', 'msvc']
+elif target_machine.system() == 'darwin'
+	makedef_args += ['--format', 'darwin']
+else
+	makedef_args += ['--prefix', extern_prefix]
+	makedef_args += ['--format', 'gcc']
+endif
+
 if use_drm
 	faac_srcs += files(
 		'libfaac/kiss_fft/kiss_fftr.c',
@@ -105,25 +124,73 @@ if use_drm
 	faac_includes += include_directories('libfaac/kiss_fft')
 	faac_args += '-DDRM'
 
-	faac = library(
+	faac_static = static_library(
 		'faac_drm',
 		faac_srcs,
 		c_args: faac_args,
 		include_directories: faac_includes,
 		dependencies: m,
-		gnu_symbol_visibility: 'hidden',
 		link_args: faac_link_args,
+		install: false,
+	)
+
+	vs_module_def = custom_target(
+		'faac_drm_def',
+		output: 'faac_drm.def',
+		command: [makedef_args, faac_static],
+		capture: true
+	)
+
+	faac_link_deps = []
+	if target_machine.system() == 'darwin'
+		faac_link_args += '-Wl,-exported_symbols_list,@0@'.format(meson.current_build_dir() / 'faac_drm.def')
+		faac_link_deps += vs_module_def
+	elif target_machine.system() != 'windows' and target_machine.system() != 'cygwin'
+		faac_link_args += '-Wl,--version-script=@0@'.format(meson.current_build_dir() / 'faac_drm.def')
+		faac_link_deps += vs_module_def
+	endif
+
+	faac = library(
+		'faac_drm',
+		link_whole: faac_static,
+		link_args: faac_link_args,
+		link_depends: faac_link_deps,
+		vs_module_defs: vs_module_def,
 		install: true,
 	)
 else
-	faac = library(
+	faac_static = static_library(
 		'faac',
 		faac_srcs,
 		c_args: faac_args,
 		include_directories: faac_includes,
 		dependencies: m,
-		gnu_symbol_visibility: 'hidden',
 		link_args: faac_link_args,
+		install: false,
+	)
+
+	vs_module_def = custom_target(
+		'faac_def',
+		output: 'faac.def',
+		command: [makedef_args, faac_static],
+		capture: true
+	)
+
+	faac_link_deps = []
+	if target_machine.system() == 'darwin'
+		faac_link_args += '-Wl,-exported_symbols_list,@0@'.format(meson.current_build_dir() / 'faac.def')
+		faac_link_deps += vs_module_def
+	elif target_machine.system() != 'windows' and target_machine.system() != 'cygwin'
+		faac_link_args += '-Wl,--version-script=@0@'.format(meson.current_build_dir() / 'faac.def')
+		faac_link_deps += vs_module_def
+	endif
+
+	faac = library(
+		'faac',
+		link_whole: faac_static,
+		link_args: faac_link_args,
+		link_depends: faac_link_deps,
+		vs_module_defs: vs_module_def,
 		install: true,
 	)
 endif
