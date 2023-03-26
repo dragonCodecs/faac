@@ -125,7 +125,7 @@ if use_drm
 	faac_args += '-DDRM'
 
 	faac_static = static_library(
-		'faac_drm',
+		'faac_drm_static',
 		faac_srcs,
 		c_args: faac_args,
 		include_directories: faac_includes,
@@ -160,7 +160,7 @@ if use_drm
 	)
 else
 	faac_static = static_library(
-		'faac',
+		'faac_static',
 		faac_srcs,
 		c_args: faac_args,
 		include_directories: faac_includes,
