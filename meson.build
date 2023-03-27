@@ -156,6 +156,7 @@ if use_drm
 		link_args: faac_link_args,
 		link_depends: faac_link_deps,
 		vs_module_defs: vs_module_def,
+		version: meson.project_version(),
 		install: true,
 	)
 else
@@ -191,6 +192,7 @@ else
 		link_args: faac_link_args,
 		link_depends: faac_link_deps,
 		vs_module_defs: vs_module_def,
+		version: meson.project_version(),
 		install: true,
 	)
 endif
