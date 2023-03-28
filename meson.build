@@ -41,7 +41,7 @@ use_drm = get_option('drm')
 
 mingw = target_machine.system() ==  'windows' and (compiler.get_id() == 'gcc' or compiler.get_id() == 'clang')
 
-cpusse = target_machine.cpu() ==  'i386' or target_machine.cpu() == 'x86_64'
+cpusse = target_machine.cpu_family() ==  'x86' or target_machine.cpu_family() == 'x86_64'
 
 # include/Makefile
 
