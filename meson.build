@@ -9,6 +9,7 @@ project(
 	default_options: [
 		'c_std=c99',
 		'warning_level=1',
+		'b_lundef=true',
 	]
 )
 
@@ -91,7 +92,6 @@ if have_immintrin_h
 	faac_args += '-DHAVE_IMMINTRIN_H'
 endif
 
-faac_link_args += compiler.get_supported_link_arguments('no-undefined')
 if mingw
 	faac_link_args += compiler.get_supported_link_arguments('-Wl,--add-stdcall-alias')
 endif
