@@ -34,7 +34,7 @@ else
 endif
 
 have_getopt_h = compiler.has_header('getopt.h')
-have_immintrin_h = compiler.has_header('immintrin.h')
+have_immintrin_h = compiler.has_header('immintrin.h') and compiler.check_header('immintrin.h')
 
 have_getopt_long = compiler.has_function('getopt_long')
 
@@ -248,7 +248,7 @@ if not use_drm
 		dependencies: faac_bin_deps,
 		install: true,
 	)
-	
+
 	if target_machine.system() ==  'windows'
 		faac_gui_srcs = files(
 			'frontend/maingui.c',
@@ -278,5 +278,5 @@ pkg = import('pkgconfig')
 
 pkg.generate(
 	faac,
-	description: 'Freeware Advanced Audio Coder' 
+	description: 'Freeware Advanced Audio Coder'
 )
