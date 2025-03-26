@@ -7,7 +7,7 @@ project(
 	version: '1.30',
 	license: 'LGPL-2.1-or-later',
 	default_options: [
-		'c_std=c99',
+		'c_std=gnu99',
 		'warning_level=1',
 		'b_lundef=true',
 	]
