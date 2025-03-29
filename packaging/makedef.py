@@ -87,7 +87,7 @@ if __name__ == '__main__':
     else:
         print(f"{libname.stem.replace('.', '_')} {{")
         print("\tglobal:")
-        print(";\n".join(sorted(set([f'\t\t{i}' for i in dump]))))
+        print(";\n".join(sorted(set([f'\t\t{i}' for i in dump]))) + ';')
         print("\tlocal:")
         print("\t\t*;")
         print("};")
